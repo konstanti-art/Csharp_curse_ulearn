@@ -1,0 +1,12 @@
+        public static int MiddleOf(int a, int b, int c)
+        {
+            if (a > c)
+            {
+                if (a < b) return a;
+                if (b > c) return b;
+                return c;
+            }
+            if (a > b) return a;
+            if (b < c) return b;
+            return c;
+        }
