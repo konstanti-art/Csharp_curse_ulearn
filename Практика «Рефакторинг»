@@ -1,0 +1,80 @@
+using System;
+using Avalonia.Media;
+using RefactorMe.Common;
+
+namespace RefactorMe
+{
+    class DrawingProgram
+    {
+        static float x, y;
+        static IGraphics graphics;
+
+        public static void Move(IGraphics newGraphics)
+        {
+            graphics = newGraphics;
+            //graphics.SmoothingMode = SmoothingMode.None;
+            graphics.Clear(Colors.Black);
+        }
+
+        public static void SetPosition(float x0, float y0)
+        {
+            x = x0; y = y0;
+        }
+
+        public static void MakeIt(Pen pen, double dlina, double angel)
+        {
+            //Делает шаг длиной dlina в направлении angel и рисует пройденную траекторию
+            var x1 = (float)(x + dlina * Math.Cos(angel));
+            var y1 = (float)(y + dlina * Math.Sin(angel));
+            graphics.DrawLine(pen, x, y, x1, y1);
+            x = x1;
+            y = y1;
+        }
+
+        public static void Change(double dlina, double angel)
+        {
+            x = (float)(x + dlina * Math.Cos(angel));
+            y = (float)(y + dlina * Math.Sin(angel));
+        }
+    }
+
+    public class ImpossibleSquare
+    {
+        public static void Draw(int shirina, int visota, double angelHow, IGraphics graphics)
+        {
+            // angelHow пока не используется, но будет использоваться в будущем
+            DrawingProgram.Move(graphics);
+
+            var sz = Math.Min(shirina, visota);
+
+            var diagonal_length = Math.Sqrt(2) * (sz * 0.375f + sz * 0.04f) / 2;
+            var x0 = (float)(diagonal_length * Math.Cos(Math.PI / 4 + Math.PI)) + shirina / 2f;
+            var y0 = (float)(diagonal_length * Math.Sin(Math.PI / 4 + Math.PI)) + visota / 2f;
+
+            DrawingProgram.SetPosition(x0, y0);
+
+            //Рисуем 1-ую сторону
+            DrawWall(0, sz);
+
+            //Рисуем 2-ую сторону
+            DrawWall(-Math.PI / 2, sz);
+
+            //Рисуем 3-ю сторону
+            DrawWall(Math.PI, sz);
+
+            //Рисуем 4-ую сторону
+            DrawWall(Math.PI / 2, sz);
+		}
+
+        public static void DrawWall(double mathPi, double sz)
+        {
+            DrawingProgram.MakeIt(new Pen(Brushes.Yellow), sz * 0.375f, mathPi);
+            DrawingProgram.MakeIt(new Pen(Brushes.Yellow), sz * 0.04f * Math.Sqrt(2), mathPi + Math.PI / 4);
+            DrawingProgram.MakeIt(new Pen(Brushes.Yellow), sz * 0.375f, mathPi + Math.PI);
+            DrawingProgram.MakeIt(new Pen(Brushes.Yellow), sz * 0.375f - sz * 0.04f, mathPi + Math.PI / 2);
+
+            DrawingProgram.Change(sz * 0.04f, mathPi + -Math.PI);
+            DrawingProgram.Change(sz * 0.04f * Math.Sqrt(2), mathPi + 3 * Math.PI / 4);
+        }        
+    }
+}
