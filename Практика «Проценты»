@@ -1,0 +1,8 @@
+public static double Calculate(string userInput)
+{
+	var parts = userInput.Split(' ');
+	var money = double.Parse(parts[0]);
+	var percent = double.Parse(parts[1])/100;
+	var time = double.Parse(parts[2]);
+	return money * Math.Pow((1 + (percent / 12)), time);
+}
