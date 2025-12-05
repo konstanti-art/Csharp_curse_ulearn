@@ -1,0 +1,5 @@
+public static string Decode(string strNumb)
+{
+	var numb = int.Parse(strNumb.Replace(".", ""));
+	return (numb % 1024).ToString();
+}
