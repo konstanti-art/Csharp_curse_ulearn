@@ -1,0 +1,60 @@
+using System;
+using Avalonia;
+using NUnit.Framework;
+using static Manipulation.Manipulator;
+
+namespace Manipulation;
+
+public static class AnglesToCoordinatesTask
+{
+    public static Point[] GetJointPositions(double shoulder, double elbow, double wrist)
+    {
+        var elbowX = UpperArm * Math.Cos(shoulder);
+        var elbowY = UpperArm * Math.Sin(shoulder);
+        var elbowPos = new Point(elbowX, elbowY);
+
+        var forearmAngle = shoulder + elbow - Math.PI;
+        var wristX = elbowX + Forearm * Math.Cos(forearmAngle);
+        var wristY = elbowY + Forearm * Math.Sin(forearmAngle);
+        var wristPos = new Point(wristX, wristY);
+
+        var palmAngle = forearmAngle + wrist - Math.PI;
+        var palmEndX = wristX + Palm * Math.Cos(palmAngle);
+        var palmEndY = wristY + Palm * Math.Sin(palmAngle);
+        var palmEndPos = new Point(palmEndX, palmEndY);
+
+        return new[]
+        {
+            elbowPos,
+            wristPos,
+            palmEndPos
+        };
+    }
+}
+
+[TestFixture]
+public class AnglesToCoordinatesTask_Tests
+{
+    [TestCase(Math.PI / 2, Math.PI / 2, Math.PI, Forearm + Palm, UpperArm)]
+    [TestCase(0, Math.PI, Math.PI, UpperArm + Forearm + Palm, 0)]
+    [TestCase(Math.PI / 2, Math.PI, Math.PI, 0, UpperArm + Forearm + Palm)]
+    [TestCase(Math.PI / 2, Math.PI / 2, Math.PI / 2, Forearm, UpperArm - Palm)]
+    public void TestGetJointPositions(double shoulder, double elbow, double wrist, double palmEndX, double palmEndY)
+    {
+        var joints = AnglesToCoordinatesTask.GetJointPositions(shoulder, elbow, wrist);
+
+        Assert.That(joints[2].X, Is.EqualTo(palmEndX).Within(1e-5), "palm endX");
+        Assert.That(joints[2].Y, Is.EqualTo(palmEndY).Within(1e-5), "palm endY");
+
+        Assert.That(GetDistance(new Point(0, 0), joints[0]), Is.EqualTo(UpperArm).Within(1e-5), "UpperArm length is incorrect");
+        Assert.That(GetDistance(joints[0], joints[1]), Is.EqualTo(Forearm).Within(1e-5), "Forearm length is incorrect");
+        Assert.That(GetDistance(joints[1], joints[2]), Is.EqualTo(Palm).Within(1e-5), "Palm length is incorrect");
+    }
+
+    private double GetDistance(Point p1, Point p2)
+    {
+        var dx = p1.X - p2.X;
+        var dy = p1.Y - p2.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+}
