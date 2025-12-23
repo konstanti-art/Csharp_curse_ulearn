@@ -1,0 +1,50 @@
+using System;
+using NUnit.Framework;
+
+namespace Manipulation;
+
+public class TriangleTask
+{
+    public static double GetABAngle(double a, double b, double c)
+    {
+        if (a <= 0 || b <= 0 || c < 0)
+            return double.NaN;
+
+        if (a + b < c || a + c < b || b + c < a)
+            return double.NaN;
+
+        double cosGamma = (a * a + b * b - c * c) / (2 * a * b);
+
+        if (cosGamma > 1.0) cosGamma = 1.0;
+        if (cosGamma < -1.0) cosGamma = -1.0;
+
+        return Math.Acos(cosGamma);
+    }
+}
+
+[TestFixture]
+public class TriangleTask_Tests
+{
+    [TestCase(3, 4, 5, Math.PI / 2)]
+    [TestCase(1, 1, 1, Math.PI / 3)]
+    [TestCase(1, 1, 2, Math.PI)]
+    [TestCase(1, 2, 1, 0)]
+    [TestCase(2, 1, 1, 0)]
+    public void TestGetABAngle(double a, double b, double c, double expectedAngle)
+    {
+        var actual = TriangleTask.GetABAngle(a, b, c);
+        Assert.That(actual, Is.EqualTo(expectedAngle).Within(1e-10));
+    }
+
+    [TestCase(-1, 1, 1)]
+    [TestCase(1, 0, 1)]
+    [TestCase(0, 1, 1)]
+    [TestCase(1, 1, 3)]
+    [TestCase(5, 1, 1)]
+    [TestCase(0, 0, 0)]
+    public void TestGetABAngle_ReturnsNaN(double a, double b, double c)
+    {
+        var actual = TriangleTask.GetABAngle(a, b, c);
+        Assert.That(actual, Is.NaN);
+    }
+}
