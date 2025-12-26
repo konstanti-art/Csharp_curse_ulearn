@@ -1,0 +1,16 @@
+public class ClockwiseComparer : IComparer
+{
+    public int Compare(object x, object y)
+    {
+        var p1 = (Point)x;
+        var p2 = (Point)y;
+
+        double angle1 = Math.Atan2(p1.Y, p1.X);
+        double angle2 = Math.Atan2(p2.Y, p2.X);
+
+        if (angle1 < 0) angle1 += 2 * Math.PI;
+        if (angle2 < 0) angle2 += 2 * Math.PI;
+
+        return angle1.CompareTo(angle2);
+    }
+}
