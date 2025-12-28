@@ -1,0 +1,74 @@
+namespace Geometry;
+
+public class Vector
+{
+    public double X;
+    public double Y;
+
+    public double GetLength()
+    {
+        return Geometry.GetLength(this);
+    }
+
+    public Vector Add(Vector other)
+    {
+        return Geometry.Add(this, other);
+    }
+
+    public bool Belongs(Segment segment)
+    {
+        return Geometry.IsVectorInSegment(this, segment);
+    }
+}
+
+public class Segment
+{
+    public Vector Begin;
+    public Vector End;
+
+    public double GetLength()
+    {
+        return Geometry.GetLength(this);
+    }
+
+    public bool Contains(Vector vector)
+    {
+        return Geometry.IsVectorInSegment(vector, this);
+    }
+}
+
+public class Geometry
+{
+    public static double GetLength(Vector vector)
+    {
+        return System.Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y);
+    }
+
+    public static Vector Add(Vector v1, Vector v2)
+    {
+        return new Vector 
+        { 
+            X = v1.X + v2.X, 
+            Y = v1.Y + v2.Y 
+        };
+    }
+
+    public static double GetLength(Segment segment)
+    {
+        double dx = segment.End.X - segment.Begin.X;
+        double dy = segment.End.Y - segment.Begin.Y;
+        return System.Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    public static bool IsVectorInSegment(Vector vector, Segment segment)
+    {
+        var seg1 = new Segment { Begin = segment.Begin, End = vector };
+        var seg2 = new Segment { Begin = vector, End = segment.End };
+
+        double len1 = GetLength(seg1);
+        double len2 = GetLength(seg2);
+        double fullLen = GetLength(segment);
+
+        return System.Math.Abs((len1 + len2) - fullLen) < 1e-9;
+    }
+}
